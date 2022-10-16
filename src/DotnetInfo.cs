@@ -23,7 +23,7 @@ public static class DotnetInfo
         foreach (var version in runtimeVersions.Reverse())
         {
             string crossgenPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                ".nuget", "packages", "microsoft.netcore.app.crossgen2.win-x64", version, "tools", "crossgen2.exe");
+                ".nuget", "packages", "microsoft.netcore.app.crossgen2.win-x64", version, "tools", PrejitAllTool.Crossgen2Exe);
          
             if (File.Exists(crossgenPath))
                 return crossgenPath;
