@@ -39,7 +39,7 @@
 
         string[] allFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.dll");
 
-        // Don't waste time on these:
+        // Don't waste time on these on Windows:
         string[] knownNativeLibs =
         {
             "clretwrc.dll",
@@ -50,7 +50,6 @@
             "hostpolicy.dll",
             "Microsoft.DiaSymReader.Native.amd64.dll",
             "mscordaccore.dll",
-            "mscordaccore_amd64_amd64_7.0.22.47203.dll",
             "mscordbi.dll",
             "mscorrc.dll",
             "msquic.dll",
@@ -58,6 +57,12 @@
         };
 
         allFiles = allFiles.Where(f => !knownNativeLibs.Contains(Path.GetFileName(f))).ToArray();
+
+        if (!allFiles.Any())
+        {
+            Logger.LogWarning("No *.dll files in the current directory");
+            return;
+        }
 
         for (var index = 0; index < allFiles.Length; index++)
         {
