@@ -5,7 +5,7 @@ public static class DotnetInfo
     private static async Task<string[]> GetRuntimeVersions()
     {
         List<string> versions = new();
-        string result = await ProcessUtils.RunProcessAsync("dotnet", "--list-runtimes");
+        string result = await ProcessUtils.RunProcessAsync("dotnet", "--list-runtimes", verbose: false);
         foreach (Match regex in Regex.Matches(result, "Microsoft.NETCore.App (.*?) \\["))
         {
             if (regex.Success)

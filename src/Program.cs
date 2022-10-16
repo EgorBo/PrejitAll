@@ -38,32 +38,31 @@
         long totalAdditionalSize = 0;
 
         string[] allFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.dll");
+
+        // Don't waste time on these:
+        string[] knownNativeLibs =
+        {
+            "clretwrc.dll",
+            "clrgc.dll",
+            "clrjit.dll",
+            "coreclr.dll",
+            "hostfxr.dll",
+            "hostpolicy.dll",
+            "Microsoft.DiaSymReader.Native.amd64.dll",
+            "mscordaccore.dll",
+            "mscordaccore_amd64_amd64_7.0.22.47203.dll",
+            "mscordbi.dll",
+            "mscorrc.dll",
+            "msquic.dll",
+            "System.IO.Compression.Native.dll"
+        };
+
+        allFiles = allFiles.Where(f => !knownNativeLibs.Contains(Path.GetFileName(f))).ToArray();
+
         for (var index = 0; index < allFiles.Length; index++)
         {
             string file = allFiles[index];
-
             string managedLibName = Path.GetFileName(file);
-
-            // Don't waste time on these:
-            string[] knownNativeLibs =
-            {
-                "clretwrc.dll",
-                "clrgc.dll",
-                "clrjit.dll",
-                "coreclr.dll",
-                "hostfxr.dll",
-                "hostpolicy.dll",
-                "Microsoft.DiaSymReader.Native.amd64.dll",
-                "mscordaccore.dll",
-                "mscordaccore_amd64_amd64_7.0.22.47203.dll",
-                "mscordbi.dll",
-                "mscorrc.dll",
-                "msquic.dll",
-                "System.IO.Compression.Native.dll"
-            };
-
-            if (knownNativeLibs.Contains(managedLibName))
-                continue;
 
             Logger.LogDebug("==========================================================");
             Logger.LogDebug($"= [{index + 1}/{allFiles.Length}] Prejitting \"{managedLibName}\"");
@@ -76,8 +75,7 @@
                 long beforeSize = new FileInfo(managedLibName).Length;
                 long afterSize = new FileInfo(tempR2Rname).Length;
 
-                if (Math.Abs(afterSize - beforeSize) > 64 * 1024)
-                    Logger.LogSuccess($"Size delta: {((afterSize - beforeSize) / 1024.0f / 1024.0f):F2}Mb");
+                Logger.LogSuccess($"Size delta: {((afterSize - beforeSize) / 1024.0f):F0}Kb");
 
                 totalAdditionalSize += afterSize - beforeSize;
 

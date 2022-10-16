@@ -7,10 +7,12 @@ public static class ProcessUtils
         string path,
         string args = "",
         Dictionary<string, string>? envVars = null,
-        string? workingDir = null)
+        string? workingDir = null,
+        bool verbose = true)
     {
         var sb = new StringBuilder();
-        Logger.LogDebug($"{path} {args}");
+        if (verbose)
+            Logger.LogDebug($"{path} {args}");
 
         Process? process = null;
         try
@@ -35,21 +37,22 @@ public static class ProcessUtils
             }
 
             process = Process.Start(processStartInfo)!;
-            process.ErrorDataReceived += (_, e) => Logger.LogError(e.Data);
+            process.ErrorDataReceived += (_, e) =>
+            {
+                if (verbose)
+                    Logger.LogError(e.Data);
+            };
             process.OutputDataReceived += (_, e) =>
             {
                 sb.Append(e.Data);
-                if (e.Data?.Contains("Emitting R2R") == true)
+                if (verbose)
                 {
-                    Logger.LogSuccess("Successfully prejitted.");
-                }
-                else if (e.Data?.Contains("No input files are loadable") == true)
-                {
-                    Logger.LogWarning("Not a managed lib");
-                }
-                else
-                {
-                    Logger.LogDebug(e.Data);
+                    if (e.Data?.Contains("Emitting R2R") == true)
+                        Logger.LogSuccess("Successfully prejitted.");
+                    else if (e.Data?.Contains("No input files are loadable") == true)
+                        Logger.LogWarning("Not a managed lib");
+                    else
+                        Logger.LogDebug(e.Data);
                 }
             };
             process.BeginOutputReadLine();
@@ -58,7 +61,8 @@ public static class ProcessUtils
         }
         catch (Exception e)
         {
-            Logger.LogError(e.Message);
+            if (verbose)
+                Logger.LogError(e.Message);
         }
         finally
         {
