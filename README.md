@@ -1,2 +1,3 @@
-# PrejitThis
-A helper tool to prejit everything in a given folder
+# PrejitAll
+
+A helper tool to prejit everything in the current folder.
